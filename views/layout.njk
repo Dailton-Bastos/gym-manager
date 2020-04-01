@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Dailton Bastos">
+  <link rel="stylesheet" href="/style.css">
+
+  {% block head %}
+    <title>Gym Manager</title>
+  {% endblock %}
+
+</head>
+<body>
+  <header>
+    <nav class="menu">
+      <ul>
+        <li><a href="/instructors" class="active">Instructors</a></li>
+        <li><a href="/members">Members</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  {% block content %}
+
+  {% endblock content%}
+
+</body>
+</html>
