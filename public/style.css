@@ -162,7 +162,8 @@ input::placeholder {
   font-weight: normal;
 }
 
-button[type='submit'] {
+button[type='submit'],
+a.button {
   padding: 8px 32px;
   background-color: var(--primary-color);
   color: #fff;
@@ -175,6 +176,17 @@ button[type='submit'] {
   transition: all 0.2s ease-out;
 }
 
+a.button {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
 button[type='submit']:hover {
   filter: brightness(90%);
+}
+
+#form-delete button {
+  margin-top: 8px;
+  background-color: lightcoral;
 }
