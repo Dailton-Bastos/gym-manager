@@ -1,6 +1,6 @@
 const fs = require('fs');
-const data = require('./data.json');
-const { getAge, getBirth } = require('./utils');
+const data = require('../data.json');
+const { getAge, getBirth } = require('../utils');
 
 const { instructors } = data;
 
@@ -27,6 +27,10 @@ exports.show = (req, res) => {
   };
 
   return res.render('instructors/show', { instructor });
+};
+
+exports.create = (req, res) => {
+  return res.render('instructors/create');
 };
 
 exports.post = (req, res) => {
@@ -68,7 +72,7 @@ exports.edit = (req, res) => {
 
   const instructor = {
     ...foundInstructor,
-    birth: getBirth(foundInstructor.birth),
+    birth: getBirth(foundInstructor.birth).iso,
   };
 
   if (!foundInstructor) return res.send('Instructor not found!');
@@ -117,5 +121,5 @@ exports.delete = (req, res) => {
     return true;
   });
 
-  return res.status(200).redirect('/instructors/');
+  return res.status(200).redirect('/instructors');
 };
