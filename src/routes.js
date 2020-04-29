@@ -24,7 +24,7 @@ routes.post('/members', members.post);
 routes.get('/members/:id', members.show);
 routes.get('/members/:id/edit', members.edit);
 routes.put('/members', members.put);
-// routes.delete('/members', members.delete);
+routes.delete('/members', members.delete);
 
 routes.use((req, res) => {
   return res.status(401).send('Page not found');

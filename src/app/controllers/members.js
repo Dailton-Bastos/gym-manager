@@ -1,10 +1,13 @@
-const { age, date } = require('../../lib/utils');
+/* eslint-disable no-param-reassign */
+const { date } = require('../../lib/utils');
 
-// Exportando com method shorthand ES6
+const Member = require('../models/Member');
 
 module.exports = {
   index(req, res) {
-    return res.render('members/index');
+    Member.all((members) => {
+      return res.render('members/index', { members });
+    });
   },
 
   create(req, res) {
@@ -22,15 +25,35 @@ module.exports = {
       return res.send('Please, fill all fields!');
     }
 
+    Member.create(req.body, (member) => {
+      return res.redirect(`/members/${member.id}`);
+    });
+
     return this;
   },
 
   show(req, res) {
-    return res.render('members/show');
+    const { id } = req.params;
+
+    Member.find(id, (member) => {
+      if (!member) return res.send('Member not found');
+
+      member.birth = date(member.birth).birthDay;
+
+      return res.render('members/show', { member });
+    });
   },
 
   edit(req, res) {
-    return res.render('members/edit');
+    const { id } = req.params;
+
+    Member.find(id, (member) => {
+      if (!member) return res.send('Member not found');
+
+      member.birth = date(member.birth).iso;
+
+      return res.render('members/edit', { member });
+    });
   },
 
   put(req, res) {
@@ -44,10 +67,19 @@ module.exports = {
       return res.send('Please, fill all fields!');
     }
 
-    return res.status(200).redirect(`/members`);
+    const { id } = req.body;
+
+    Member.update(req.body, () => {
+      return res.status(200).redirect(`/members/${id}`);
+    });
+    return this;
   },
 
-  detele(req, res) {
-    return res.send('OK');
+  delete(req, res) {
+    const { id } = req.body;
+
+    Member.delete(id, () => {
+      return res.redirect(`/members`);
+    });
   },
 };
