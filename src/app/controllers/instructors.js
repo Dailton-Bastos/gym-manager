@@ -1,10 +1,14 @@
+/* eslint-disable no-param-reassign */
 const { age, date } = require('../../lib/utils');
 
-// Exportando com method shorthand ES6
+const Instructor = require('../models/Instructor');
 
+// Exportando com method shorthand ES6
 module.exports = {
   index(req, res) {
-    return res.render('instructors/index');
+    Instructor.all((instructors) => {
+      return res.render('instructors/index', { instructors });
+    });
   },
 
   create(req, res) {
@@ -22,17 +26,37 @@ module.exports = {
       return res.send('Please, fill all fields!');
     }
 
-    const { avatar_url, name, birth, gender, services } = req.body;
+    Instructor.create(req.body, (instructor) => {
+      return res.redirect(`/instructors/${instructor.id}`);
+    });
 
     return this;
   },
 
   show(req, res) {
-    return res.render('instructors/show');
+    const { id } = req.params;
+
+    Instructor.find(id, (instructor) => {
+      if (!instructor) return res.send('Instructor not found');
+
+      instructor.age = age(instructor.birth);
+      instructor.services = instructor.services.split(', ');
+      instructor.created_at = date(instructor.created_at).format;
+
+      return res.render('instructors/show', { instructor });
+    });
   },
 
   edit(req, res) {
-    return res.render('instructors/edit');
+    const { id } = req.params;
+
+    Instructor.find(id, (instructor) => {
+      if (!instructor) return res.send('Instructor not found');
+
+      instructor.birth = date(instructor.birth).iso;
+
+      return res.render('instructors/edit', { instructor });
+    });
   },
 
   put(req, res) {
@@ -46,10 +70,19 @@ module.exports = {
       return res.send('Please, fill all fields!');
     }
 
-    return res.status(200).redirect(`/instructors`);
+    const { id } = req.body;
+
+    Instructor.update(req.body, () => {
+      return res.status(200).redirect(`/instructors/${id}`);
+    });
+    return this;
   },
 
   delete(req, res) {
-    return res.send('OK');
+    const { id } = req.body;
+
+    Instructor.delete(id, () => {
+      return res.redirect(`/instructors`);
+    });
   },
 };
