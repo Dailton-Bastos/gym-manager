@@ -6,9 +6,17 @@ const Instructor = require('../models/Instructor');
 // Exportando com method shorthand ES6
 module.exports = {
   index(req, res) {
-    Instructor.all((instructors) => {
-      return res.render('instructors/index', { instructors });
-    });
+    const { filter } = req.query;
+
+    if (filter) {
+      Instructor.findBy(filter, (instructors) => {
+        return res.render('instructors/index', { instructors, filter });
+      });
+    } else {
+      Instructor.all((instructors) => {
+        return res.render('instructors/index', { instructors });
+      });
+    }
   },
 
   create(req, res) {
