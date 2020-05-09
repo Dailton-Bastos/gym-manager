@@ -5,9 +5,33 @@ const Member = require('../models/Member');
 
 module.exports = {
   index(req, res) {
-    Member.all((members) => {
-      return res.render('members/index', { members });
-    });
+    let { page, limit } = req.query;
+    const { filter } = req.query;
+
+    page = page || 1;
+    limit = limit || 2;
+
+    const offset = limit * (page - 1);
+
+    const params = {
+      filter,
+      page,
+      limit,
+      offset,
+      callback(members) {
+        const pagination = {
+          total: Math.ceil(members[0].total / limit),
+          page,
+        };
+        return res.render('members/index', {
+          members,
+          pagination,
+          filter,
+        });
+      },
+    };
+
+    Member.paginate(params);
   },
 
   create(req, res) {
@@ -38,7 +62,7 @@ module.exports = {
     const { id } = req.params;
 
     Member.find(id, (member) => {
-      if (!member) return res.send('Member not found');
+      if (!member) return res.render('notFound', { msg: 'Member not found' });
 
       member.birth = date(member.birth).birthDay;
 

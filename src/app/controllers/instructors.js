@@ -6,17 +6,33 @@ const Instructor = require('../models/Instructor');
 // Exportando com method shorthand ES6
 module.exports = {
   index(req, res) {
+    let { page, limit } = req.query;
     const { filter } = req.query;
 
-    if (filter) {
-      Instructor.findBy(filter, (instructors) => {
-        return res.render('instructors/index', { instructors, filter });
-      });
-    } else {
-      Instructor.all((instructors) => {
-        return res.render('instructors/index', { instructors });
-      });
-    }
+    page = page || 1;
+    limit = limit || 2;
+
+    const offset = limit * (page - 1);
+
+    const params = {
+      filter,
+      page,
+      limit,
+      offset,
+      callback(instructors) {
+        const pagination = {
+          total: Math.ceil(instructors[0].total / limit),
+          page,
+        };
+        return res.render('instructors/index', {
+          instructors,
+          pagination,
+          filter,
+        });
+      },
+    };
+
+    Instructor.paginate(params);
   },
 
   create(req, res) {

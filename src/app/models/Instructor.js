@@ -112,4 +112,40 @@ module.exports = {
       return callback();
     });
   },
+
+  paginate(params) {
+    const { filter, limit, offset, callback } = params;
+
+    let query = '';
+    let filterQuery = '';
+    let totalQuery = `(
+      SELECT count(*) FROM instructors
+    ) AS total`;
+
+    if (filter) {
+      filterQuery = `
+        WHERE instructors.name ILIKE '%${filter}%'
+        OR instructors.services ILIKE '%${filter}%'
+      `;
+
+      totalQuery = `(
+        SELECT count(*) FROM instructors
+        ${filterQuery}
+      ) AS total`;
+    }
+
+    query = `
+    SELECT instructors.*, ${totalQuery}, count(members) AS total_students
+    FROM instructors
+    LEFT JOIN members ON (instructors.id = members.instructor_id)
+    ${filterQuery}
+    GROUP by instructors.id LIMIT $1 OFFSET $2
+    `;
+
+    db.query(query, [limit, offset], (err, results) => {
+      if (err) throw `Database Error! ${err}`;
+
+      return callback(results.rows);
+    });
+  },
 };
